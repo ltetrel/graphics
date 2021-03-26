@@ -32,7 +32,7 @@ def estimate_radiance(point_light_radiance,
                       surface_point_normal,
                       observation_point,
                       brdf,
-                      name=None,
+                      name="estimate_radiance",
                       reflected_light_fall_off=False):
   """Estimates the spectral radiance of a point light reflected from the surface point towards the observation point.
 
@@ -87,10 +87,7 @@ def estimate_radiance(point_light_radiance,
     not supported.
     InvalidArgumentError: if 'surface_point_normal' is not normalized.
   """
-  with tf.compat.v1.name_scope(name, "estimate_radiance", [
-      point_light_radiance, point_light_position, surface_point_position,
-      surface_point_normal, observation_point, brdf
-  ]):
+  with tf.name_scope(name):
     point_light_radiance = tf.convert_to_tensor(value=point_light_radiance)
     point_light_position = tf.convert_to_tensor(value=point_light_position)
     surface_point_position = tf.convert_to_tensor(value=surface_point_position)
@@ -173,12 +170,12 @@ def estimate_radiance(point_light_radiance,
                          outgoing_light_dot_surface_normal)
     common_shape = shape.get_broadcasted_shape(min_dot.shape,
                                                estimated_radiance.shape)
-    d_val = lambda dim: 1 if dim is None else tf.compat.v1.dimension_value(dim)
+    d_val = lambda dim: 1 if dim is None else tf.compat.dimension_value(dim)
     common_shape = [d_val(dim) for dim in common_shape]
     condition = tf.broadcast_to(tf.greater_equal(min_dot, 0.0), common_shape)
 
-    return tf.compat.v1.where(condition, estimated_radiance,
-                              tf.zeros_like(estimated_radiance))
+    return tf.where(condition, estimated_radiance,
+                    tf.zeros_like(estimated_radiance))
 
 
 # API contains all public functions and classes.
